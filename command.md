@@ -223,7 +223,7 @@ php bin/magento config:set --lock-env web/secure/use_in_adminhtml 0
 
 **Install Magento**
 ```bash
-sudo php bin/magento setup:install \
+php bin/magento setup:install \
   --base-url=http://ce247.com/ \
   --db-host=127.0.0.1 \
   --db-name=ce247 \
@@ -269,7 +269,7 @@ composer create-project --repository-url=https://repo.magento.com/ magento/proje
 
 **Disable 2FA modules**
 ```bash
-sudo php bin/magento module:disable Magento_AdminAdobeImsTwoFactorAuth Magento_TwoFactorAuth
+php bin/magento module:disable Magento_AdminAdobeImsTwoFactorAuth Magento_TwoFactorAuth
 ```
 
 **DI compile**
@@ -293,17 +293,17 @@ php bin/magento setup:perf:generate-fixtures setup/performance-toolkit/profiles/
 
 **Disable admin captcha**
 ```bash
-sudo php bin/magento config:set admin/captcha/enable 0
+php bin/magento config:set admin/captcha/enable 0
 ```
 
 **Disable customer captcha**
 ```bash
-sudo php bin/magento config:set customer/captcha/enable 0
+php bin/magento config:set customer/captcha/enable 0
 ```
 
 **Disable form key (dev only)**
 ```bash
-sudo php bin/magento config:set admin/security/use_form_key 0
+php bin/magento config:set admin/security/use_form_key 0
 ```
 
 **Disable password lifetime**
@@ -313,7 +313,7 @@ php bin/magento config:set admin/security/password_lifetime 00
 
 **Enable template hints**
 ```bash
-sudo php bin/magento dev:template-hints:enable
+php bin/magento dev:template-hints:enable
 ```
 
 **Disable JS merge**
@@ -343,7 +343,7 @@ php bin/magento config:set catalog/search/elasticsearch7_index_prefix ce247p3_ch
 
 **Set base URL (ngrok)**
 ```bash
-sudo bin/magento config:set web/unsecure/base_url https://open-moderately-mudfish.ngrok-free.app/DashBroard/pub/
+bin/magento config:set web/unsecure/base_url https://open-moderately-mudfish.ngrok-free.app/DashBroard/pub/
 ```
 
 ---
@@ -352,7 +352,7 @@ sudo bin/magento config:set web/unsecure/base_url https://open-moderately-mudfis
 
 **Fix permissions**
 ```bash
-sudo chown -R www-data:www-data generated/ var/ pub/
+chown -R www-data:www-data generated/ var/ pub/
 ```
 
 ---
@@ -361,15 +361,15 @@ sudo chown -R www-data:www-data generated/ var/ pub/
 
 **Switch PHP version (Apache)**
 ```bash
-sudo a2dismod php7.1
-sudo a2enmod php8.1
-sudo service apache2 restart
-sudo update-alternatives --set php /usr/bin/php8.1
+a2dismod php7.1
+a2enmod php8.1
+service apache2 restart
+update-alternatives --set php /usr/bin/php8.1
 ```
 
 **Install PHP 8.2 with Magento modules**
 ```bash
-sudo apt install php8.2 libapache2-mod-php8.2 php8.2-common php8.2-gmp php8.2-curl \
+apt install php8.2 libapache2-mod-php8.2 php8.2-common php8.2-gmp php8.2-curl \
   php8.2-soap php8.2-bcmath php8.2-intl php8.2-mbstring php8.2-xmlrpc php8.2-mysql \
   php8.2-gd php8.2-xml php8.2-cli php8.2-zip
 ```
@@ -380,18 +380,18 @@ sudo apt install php8.2 libapache2-mod-php8.2 php8.2-common php8.2-gmp php8.2-cu
 
 **Stop all services**
 ```bash
-sudo systemctl stop apache2
-sudo systemctl stop mysql
-sudo systemctl stop elasticsearch
-sudo systemctl stop varnish
+systemctl stop apache2
+systemctl stop mysql
+systemctl stop elasticsearch
+systemctl stop varnish
 ```
 
 **Start all services**
 ```bash
-sudo systemctl start apache2
-sudo systemctl start mysql
-sudo systemctl start elasticsearch
-sudo service varnish restart
+systemctl start apache2
+systemctl start mysql
+systemctl start elasticsearch
+service varnish restart
 ```
 
 ---
@@ -400,7 +400,7 @@ sudo service varnish restart
 
 **Heap size config**
 ```bash
-sudo nano /etc/elasticsearch/jvm.options
+nano /etc/elasticsearch/jvm.options
 ```
 
 **Sample ES Query**
@@ -433,7 +433,7 @@ vendor/bin/phpcs app/code/Mageplaza/Osc/ --standard=Magento2 --severity=10 --ext
 
 **Generate whitelist**
 ```bash
-sudo php bin/magento setup:db-declaration:generate-whitelist --module-name=Mageplaza_Osc
+php bin/magento setup:db-declaration:generate-whitelist --module-name=Mageplaza_Osc
 ```
 
 ---
@@ -478,7 +478,7 @@ ngrok http --domain=open-moderately-mudfish.ngrok-free.app 80
 
 **Tail MySQL log**
 ```bash
-sudo tail -f /var/log/mysql/mysql.log
+tail -f /var/log/mysql/mysql.log
 ```
 
 **Grep in codebase**
