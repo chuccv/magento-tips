@@ -24,6 +24,199 @@ mysql -u root -p database_name < dbname.sql
 
 ---
 
+## Magento Common Commands
+
+### Cache
+
+**Flush all cache**
+```bash
+php bin/magento cache:flush
+```
+
+**Clean cache**
+```bash
+php bin/magento cache:clean
+```
+
+**Disable cache**
+```bash
+php bin/magento cache:disable
+```
+
+**Enable cache**
+```bash
+php bin/magento cache:enable
+```
+
+**Cache status**
+```bash
+php bin/magento cache:status
+```
+
+---
+
+### Indexer
+
+**Reindex all**
+```bash
+php bin/magento indexer:reindex
+```
+
+**Reindex specific**
+```bash
+php bin/magento indexer:reindex catalog_product_price cataloginventory_stock
+```
+
+**Indexer status**
+```bash
+php bin/magento indexer:status
+```
+
+**Set indexer to realtime**
+```bash
+php bin/magento indexer:set-mode realtime
+```
+
+**Set indexer to schedule**
+```bash
+php bin/magento indexer:set-mode schedule
+```
+
+---
+
+### Setup
+
+**Setup upgrade**
+```bash
+php bin/magento setup:upgrade
+```
+
+**Setup upgrade (no recompile)**
+```bash
+php bin/magento setup:upgrade --keep-generated
+```
+
+**Static content deploy**
+```bash
+php bin/magento setup:static-content:deploy -f
+```
+
+**Static content deploy specific locale**
+```bash
+php bin/magento setup:static-content:deploy en_US vi_VN -f
+```
+
+**DI compile**
+```bash
+php bin/magento setup:di:compile
+```
+
+---
+
+### Maintenance
+
+**Enable maintenance**
+```bash
+php bin/magento maintenance:enable
+```
+
+**Disable maintenance**
+```bash
+php bin/magento maintenance:disable
+```
+
+**Maintenance status**
+```bash
+php bin/magento maintenance:status
+```
+
+---
+
+### Module
+
+**Enable module**
+```bash
+php bin/magento module:enable Vendor_Module
+```
+
+**Disable module**
+```bash
+php bin/magento module:disable Vendor_Module
+```
+
+**Module status**
+```bash
+php bin/magento module:status
+```
+
+---
+
+### Cron
+
+**Run cron**
+```bash
+php bin/magento cron:run
+```
+
+**Install cron**
+```bash
+php bin/magento cron:install
+```
+
+**Remove cron**
+```bash
+php bin/magento cron:remove
+```
+
+---
+
+### Admin
+
+**Reset admin password**
+```bash
+php bin/magento admin:user:unlock admin
+```
+
+**Create admin token (API)**
+```bash
+php bin/magento admin:token:create admin
+```
+
+---
+
+### Deploy Mode
+
+**Set developer mode**
+```bash
+php bin/magento deploy:mode:set developer
+```
+
+**Set production mode**
+```bash
+php bin/magento deploy:mode:set production
+```
+
+**Show current mode**
+```bash
+php bin/magento deploy:mode:show
+```
+
+---
+
+### Config
+
+**Show config value**
+```bash
+php bin/magento config:show web/unsecure/base_url
+```
+
+**Delete config**
+```bash
+php bin/magento config:set --lock-env web/secure/use_in_adminhtml 0
+```
+
+---
+
 ## Magento CLI Commands
 
 ### Setup & Install
