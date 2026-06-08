@@ -1,28 +1,4 @@
-# MySQL and Magento Commands Reference
-
-## MySQL Import / Export
-
-**Import with optimization flags**
-```bash
-(echo "SET SESSION unique_checks=0; SET SESSION foreign_key_checks=0; SET SESSION autocommit=0;"; gunzip -c back_up/gsp.010626.sql.gz; echo "COMMIT;") | mysql -hdb -u root -p magento
-```
-
-**Import with pv (progress bar)**
-```bash
-pv back_up/gsp.010626.sql.gz | gunzip | mysql -hdb -u root -p magento
-```
-
-**Export database**
-```bash
-mysqldump -h 127.0.0.1 -u root dashboard > dashboard.sql
-```
-
-**Import database**
-```bash
-mysql -u root -p database_name < dbname.sql
-```
-
----
+# Magento and MySQL Commands Reference
 
 ## Magento Common Commands
 
@@ -144,6 +120,11 @@ php bin/magento module:enable Vendor_Module
 php bin/magento module:disable Vendor_Module
 ```
 
+**Disable 2FA modules**
+```bash
+php bin/magento module:disable Magento_AdminAdobeImsTwoFactorAuth Magento_TwoFactorAuth
+```
+
 **Module status**
 ```bash
 php bin/magento module:status
@@ -175,6 +156,16 @@ php bin/magento cron:remove
 **Reset admin password**
 ```bash
 php bin/magento admin:user:unlock admin
+```
+
+**Create admin user**
+```bash
+php bin/magento admin:user:create \
+  --admin-user=admin1 \
+  --admin-password=admin123 \
+  --admin-email=hi1@mageplaza.com \
+  --admin-firstname=Mageplaza \
+  --admin-lastname=Family
 ```
 
 **Create admin token (API)**
@@ -209,87 +200,6 @@ php bin/magento deploy:mode:show
 ```bash
 php bin/magento config:show web/unsecure/base_url
 ```
-
-**Delete config**
-```bash
-php bin/magento config:set --lock-env web/secure/use_in_adminhtml 0
-```
-
----
-
-## Magento CLI Commands
-
-### Setup & Install
-
-**Install Magento**
-```bash
-php bin/magento setup:install \
-  --base-url=http://ce247.com/ \
-  --db-host=127.0.0.1 \
-  --db-name=ce247 \
-  --db-user=root \
-  --db-password=vanchuc97 \
-  --admin-firstname=admin \
-  --admin-lastname=admin \
-  --admin-email=admin@admin.com \
-  --admin-user=admin \
-  --admin-password=admin123 \
-  --language=en_US \
-  --currency=USD \
-  --timezone=America/Chicago \
-  --use-rewrites=1 \
-  --backend-frontname="admin" \
-  --search-engine=elasticsearch7 \
-  --cleanup-database
-```
-
-**Create admin user**
-```bash
-php bin/magento admin:user:create \
-  --admin-user=admin1 \
-  --admin-password=admin123 \
-  --admin-email=hi1@mageplaza.com \
-  --admin-firstname=Mageplaza \
-  --admin-lastname=Family
-```
-
-**Install CE**
-```bash
-composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition=2.4.7-p3 ce247p3
-```
-
-**Install EE**
-```bash
-composer create-project --repository-url=https://repo.magento.com/ magento/project-enterprise-edition=2.4.7 ee247
-```
-
----
-
-### Module Management
-
-**Disable 2FA modules**
-```bash
-php bin/magento module:disable Magento_AdminAdobeImsTwoFactorAuth Magento_TwoFactorAuth
-```
-
-**DI compile**
-```bash
-php -d memory_limit=5G bin/magento setup:di:compile
-```
-
-**Set developer mode**
-```bash
-php bin/magento deploy:mode:set developer
-```
-
-**Generate fixtures (performance toolkit)**
-```bash
-php bin/magento setup:perf:generate-fixtures setup/performance-toolkit/profiles/ce/small.xml
-```
-
----
-
-### Config Settings
 
 **Disable admin captcha**
 ```bash
@@ -343,7 +253,7 @@ php bin/magento config:set catalog/search/elasticsearch7_index_prefix ce247p3_ch
 
 **Set base URL (ngrok)**
 ```bash
-bin/magento config:set web/unsecure/base_url https://open-moderately-mudfish.ngrok-free.app/DashBroard/pub/
+php bin/magento config:set web/unsecure/base_url https://open-moderately-mudfish.ngrok-free.app/DashBroard/pub/
 ```
 
 ---
@@ -353,6 +263,83 @@ bin/magento config:set web/unsecure/base_url https://open-moderately-mudfish.ngr
 **Fix permissions**
 ```bash
 sudo chown -R www-data:www-data generated/ var/ pub/
+```
+
+---
+
+## Magento Install
+
+**Install Magento**
+```bash
+php bin/magento setup:install \
+  --base-url=http://ce247.com/ \
+  --db-host=127.0.0.1 \
+  --db-name=ce247 \
+  --db-user=root \
+  --db-password=vanchuc97 \
+  --admin-firstname=admin \
+  --admin-lastname=admin \
+  --admin-email=admin@admin.com \
+  --admin-user=admin \
+  --admin-password=admin123 \
+  --language=en_US \
+  --currency=USD \
+  --timezone=America/Chicago \
+  --use-rewrites=1 \
+  --backend-frontname="admin" \
+  --search-engine=elasticsearch7 \
+  --cleanup-database
+```
+
+**Install CE**
+```bash
+composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition=2.4.7-p3 ce247p3
+```
+
+**Install EE**
+```bash
+composer create-project --repository-url=https://repo.magento.com/ magento/project-enterprise-edition=2.4.7 ee247
+```
+
+**Generate fixtures (performance toolkit)**
+```bash
+php bin/magento setup:perf:generate-fixtures setup/performance-toolkit/profiles/ce/small.xml
+```
+
+---
+
+## Composer
+
+**Require module**
+```bash
+composer require mageplaza/module-social-login:dev-2.4-develop
+```
+
+```bash
+composer require mageplaza/module-core
+```
+
+---
+
+## Code Quality
+
+**PHPCS check**
+```bash
+vendor/bin/phpcs app/code/Mageplaza/Osc/ --standard=Magento2 --severity=10 --extensions=php,phtml
+```
+
+**Generate whitelist**
+```bash
+php bin/magento setup:db-declaration:generate-whitelist --module-name=Mageplaza_Osc
+```
+
+---
+
+## Xdebug
+
+**Start with Xdebug**
+```bash
+XDEBUG_SESSION_START="PHPSTORM" php bin/magento se:up
 ```
 
 ---
@@ -424,42 +411,6 @@ sudo nano /etc/elasticsearch/jvm.options
 
 ---
 
-## Code Quality
-
-**PHPCS check**
-```bash
-vendor/bin/phpcs app/code/Mageplaza/Osc/ --standard=Magento2 --severity=10 --extensions=php,phtml
-```
-
-**Generate whitelist**
-```bash
-php bin/magento setup:db-declaration:generate-whitelist --module-name=Mageplaza_Osc
-```
-
----
-
-## Composer
-
-**Require module**
-```bash
-composer require mageplaza/module-social-login:dev-2.4-develop
-```
-
-```bash
-composer require mageplaza/module-core
-```
-
----
-
-## Xdebug
-
-**Start with Xdebug**
-```bash
-XDEBUG_SESSION_START="PHPSTORM" php bin/magento se:up
-```
-
----
-
 ## SSH & ngrok
 
 **Generate SSH key**
@@ -470,6 +421,30 @@ ssh-keygen -t rsa -b 4096 -C "chuccv@mageplaza.com"
 **ngrok tunnel**
 ```bash
 ngrok http --domain=open-moderately-mudfish.ngrok-free.app 80
+```
+
+---
+
+## MySQL Import / Export
+
+**Import with optimization flags**
+```bash
+(echo "SET SESSION unique_checks=0; SET SESSION foreign_key_checks=0; SET SESSION autocommit=0;"; gunzip -c back_up/gsp.010626.sql.gz; echo "COMMIT;") | mysql -hdb -u root -p magento
+```
+
+**Import with pv (progress bar)**
+```bash
+pv back_up/gsp.010626.sql.gz | gunzip | mysql -hdb -u root -p magento
+```
+
+**Export database**
+```bash
+mysqldump -h 127.0.0.1 -u root dashboard > dashboard.sql
+```
+
+**Import database**
+```bash
+mysql -u root -p database_name < dbname.sql
 ```
 
 ---
