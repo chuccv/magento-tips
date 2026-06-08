@@ -352,7 +352,7 @@ bin/magento config:set web/unsecure/base_url https://open-moderately-mudfish.ngr
 
 **Fix permissions**
 ```bash
-chown -R www-data:www-data generated/ var/ pub/
+sudo chown -R www-data:www-data generated/ var/ pub/
 ```
 
 ---
@@ -361,15 +361,15 @@ chown -R www-data:www-data generated/ var/ pub/
 
 **Switch PHP version (Apache)**
 ```bash
-a2dismod php7.1
-a2enmod php8.1
-service apache2 restart
-update-alternatives --set php /usr/bin/php8.1
+sudo a2dismod php7.1
+sudo a2enmod php8.1
+sudo service apache2 restart
+sudo update-alternatives --set php /usr/bin/php8.1
 ```
 
 **Install PHP 8.2 with Magento modules**
 ```bash
-apt install php8.2 libapache2-mod-php8.2 php8.2-common php8.2-gmp php8.2-curl \
+sudo apt install php8.2 libapache2-mod-php8.2 php8.2-common php8.2-gmp php8.2-curl \
   php8.2-soap php8.2-bcmath php8.2-intl php8.2-mbstring php8.2-xmlrpc php8.2-mysql \
   php8.2-gd php8.2-xml php8.2-cli php8.2-zip
 ```
@@ -380,18 +380,18 @@ apt install php8.2 libapache2-mod-php8.2 php8.2-common php8.2-gmp php8.2-curl \
 
 **Stop all services**
 ```bash
-systemctl stop apache2
-systemctl stop mysql
-systemctl stop elasticsearch
-systemctl stop varnish
+sudo systemctl stop apache2
+sudo systemctl stop mysql
+sudo systemctl stop elasticsearch
+sudo systemctl stop varnish
 ```
 
 **Start all services**
 ```bash
-systemctl start apache2
-systemctl start mysql
-systemctl start elasticsearch
-service varnish restart
+sudo systemctl start apache2
+sudo systemctl start mysql
+sudo systemctl start elasticsearch
+sudo service varnish restart
 ```
 
 ---
@@ -400,7 +400,7 @@ service varnish restart
 
 **Heap size config**
 ```bash
-nano /etc/elasticsearch/jvm.options
+sudo nano /etc/elasticsearch/jvm.options
 ```
 
 **Sample ES Query**
