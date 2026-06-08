@@ -234,11 +234,3 @@ grep "getHtmlSlider"
 echo '<pre>'; var_dump($variable); echo '</pre>';
 ```
 
----
-
-## Quick Scripts
-
-```bash
-# Install script shortcut
-sh install.sh ce243 chuccv ce243
-```
