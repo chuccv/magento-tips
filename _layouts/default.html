@@ -7,7 +7,15 @@
   <link rel="icon" type="image/png" href="{{ '/favicon.png' | relative_url }}">
   <link rel="stylesheet" href="{{ '/assets/main.css' | relative_url }}">
   <style>
-    body { margin: 0; display: flex; min-height: 100vh; }
+    body { margin: 0; background: #f8f8f8; }
+
+    /* Centered wrapper */
+    #wrapper {
+      display: flex;
+      max-width: 1080px;
+      margin: 0 auto;
+      min-height: 100vh;
+    }
 
     /* Sidebar */
     #sidebar {
@@ -16,11 +24,10 @@
       background: #1e1e2e;
       color: #cdd6f4;
       padding: 16px 0;
-      position: fixed;
-      top: 0; left: 0;
+      position: sticky;
+      top: 0;
       height: 100vh;
       overflow-y: auto;
-      z-index: 100;
       font-size: 13px;
     }
     #sidebar .site-title {
@@ -57,10 +64,10 @@
 
     /* Main content */
     #main-content {
-      margin-left: 220px;
-      padding: 32px 40px;
       flex: 1;
-      max-width: 860px;
+      padding: 32px 40px;
+      background: #fff;
+      min-width: 0;
     }
 
     /* Copy button */
@@ -76,11 +83,12 @@
 
     @media (max-width: 768px) {
       #sidebar { display: none; }
-      #main-content { margin-left: 0; padding: 16px; }
+      #main-content { padding: 16px; }
     }
   </style>
 </head>
 <body>
+<div id="wrapper">
   <nav id="sidebar">
     <a class="site-title" href="{{ '/' | relative_url }}">⚡ Magento Tips</a>
     <ul id="nav-links">
@@ -115,6 +123,7 @@
   <main id="main-content">
     {{ content }}
   </main>
+</div>
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {
