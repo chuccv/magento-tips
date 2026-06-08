@@ -33,10 +33,31 @@
     #sidebar .site-title {
       font-size: 15px;
       font-weight: bold;
-      padding: 8px 16px 16px;
+      padding: 8px 16px 10px;
       color: #cba6f7;
       text-decoration: none;
       display: block;
+    }
+    .search-hint {
+      margin: 0 12px 12px;
+      padding: 5px 10px;
+      background: #313244;
+      border-radius: 6px;
+      color: #6c7086;
+      font-size: 11px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.15s;
+    }
+    .search-hint:hover { background: #45475a; color: #cdd6f4; }
+    .search-hint kbd {
+      background: #45475a;
+      border-radius: 3px;
+      padding: 1px 5px;
+      font-size: 10px;
+      color: #cba6f7;
     }
     #sidebar ul { list-style: none; margin: 0; padding: 0; }
     #sidebar li a {
@@ -81,6 +102,74 @@
     .copy-btn:hover { opacity: 1; }
     .copy-btn.copied { background: #2a9d5c; opacity: 1; }
 
+    /* Search modal */
+    #search-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 15vh;
+    }
+    #search-overlay.open { display: flex; }
+    #search-box {
+      background: #1e1e2e;
+      border-radius: 10px;
+      width: 560px;
+      max-width: 90vw;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+    #search-input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 14px 16px;
+      font-size: 16px;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid #313244;
+      color: #cdd6f4;
+      outline: none;
+    }
+    #search-input::placeholder { color: #6c7086; }
+    #search-results { max-height: 360px; overflow-y: auto; }
+    .search-item {
+      padding: 10px 16px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      border-left: 3px solid transparent;
+      transition: background 0.1s;
+    }
+    .search-item:hover,
+    .search-item.selected {
+      background: #313244;
+      border-left-color: #cba6f7;
+    }
+    .search-item .item-title { color: #cdd6f4; font-size: 14px; }
+    .search-item .item-section { color: #6c7086; font-size: 11px; }
+    .search-item .item-cmd { color: #a6e3a1; font-size: 12px; font-family: monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .search-empty { padding: 24px 16px; color: #6c7086; font-size: 14px; text-align: center; }
+    #search-footer {
+      padding: 8px 16px;
+      border-top: 1px solid #313244;
+      font-size: 11px;
+      color: #6c7086;
+      display: flex;
+      gap: 16px;
+    }
+    #search-footer kbd {
+      background: #313244;
+      border-radius: 3px;
+      padding: 1px 5px;
+      color: #cba6f7;
+    }
+
+    .highlight { color: #f38ba8; font-weight: bold; }
+
     @media (max-width: 768px) {
       #sidebar { display: none; }
       #main-content { padding: 16px; }
@@ -88,9 +177,27 @@
   </style>
 </head>
 <body>
+
+<!-- Search modal -->
+<div id="search-overlay">
+  <div id="search-box">
+    <input id="search-input" type="text" placeholder="Search commands..." autocomplete="off" />
+    <div id="search-results"></div>
+    <div id="search-footer">
+      <span><kbd>↑↓</kbd> navigate</span>
+      <span><kbd>Enter</kbd> go</span>
+      <span><kbd>Esc</kbd> close</span>
+    </div>
+  </div>
+</div>
+
 <div id="wrapper">
   <nav id="sidebar">
     <a class="site-title" href="{{ '/' | relative_url }}">⚡ Magento Tips</a>
+    <div class="search-hint" id="open-search">
+      <span>Search...</span>
+      <kbd>Ctrl K</kbd>
+    </div>
     <ul id="nav-links">
       <li class="section-header">Magento</li>
       <li><a href="#magento-common-commands">Common Commands</a></li>
@@ -125,43 +232,151 @@
   </main>
 </div>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      // Copy buttons
-      document.querySelectorAll("pre").forEach(function (pre) {
-        var wrapper = document.createElement("div");
-        wrapper.className = "code-block-wrapper";
-        pre.parentNode.insertBefore(wrapper, pre);
-        wrapper.appendChild(pre);
-        var btn = document.createElement("button");
-        btn.className = "copy-btn";
-        btn.textContent = "Copy";
-        wrapper.appendChild(btn);
-        btn.addEventListener("click", function () {
-          var text = (pre.querySelector("code") || pre).innerText;
-          navigator.clipboard.writeText(text).then(function () {
-            btn.textContent = "Copied!";
-            btn.classList.add("copied");
-            setTimeout(function () { btn.textContent = "Copy"; btn.classList.remove("copied"); }, 2000);
-          });
-        });
-      });
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
 
-      // Active nav highlight on scroll
-      var links = document.querySelectorAll("#nav-links a[href^='#']");
-      var sections = Array.from(links).map(function(a) {
-        return document.getElementById(a.getAttribute("href").slice(1));
-      }).filter(Boolean);
-
-      window.addEventListener("scroll", function () {
-        var fromTop = window.scrollY + 80;
-        var current = sections[0];
-        sections.forEach(function(s) { if (s.offsetTop <= fromTop) current = s; });
-        links.forEach(function(a) {
-          a.classList.toggle("active", a.getAttribute("href") === "#" + current.id);
+    // ── Copy buttons ──────────────────────────────────────────
+    document.querySelectorAll("pre").forEach(function (pre) {
+      var wrapper = document.createElement("div");
+      wrapper.className = "code-block-wrapper";
+      pre.parentNode.insertBefore(wrapper, pre);
+      wrapper.appendChild(pre);
+      var btn = document.createElement("button");
+      btn.className = "copy-btn";
+      btn.textContent = "Copy";
+      wrapper.appendChild(btn);
+      btn.addEventListener("click", function () {
+        var text = (pre.querySelector("code") || pre).innerText;
+        navigator.clipboard.writeText(text).then(function () {
+          btn.textContent = "Copied!";
+          btn.classList.add("copied");
+          setTimeout(function () { btn.textContent = "Copy"; btn.classList.remove("copied"); }, 2000);
         });
       });
     });
-  </script>
+
+    // ── Active nav on scroll ──────────────────────────────────
+    var navLinks = document.querySelectorAll("#nav-links a[href^='#']");
+    var sections = Array.from(navLinks).map(function(a) {
+      return document.getElementById(a.getAttribute("href").slice(1));
+    }).filter(Boolean);
+
+    window.addEventListener("scroll", function () {
+      var fromTop = window.scrollY + 80;
+      var current = sections[0];
+      sections.forEach(function(s) { if (s.offsetTop <= fromTop) current = s; });
+      navLinks.forEach(function(a) {
+        a.classList.toggle("active", a.getAttribute("href") === "#" + current.id);
+      });
+    });
+
+    // ── Build search index ────────────────────────────────────
+    var index = [];
+    var currentSection = "";
+    document.querySelectorAll("#main-content h2, #main-content h3, #main-content strong, #main-content pre code").forEach(function(el) {
+      if (el.matches("h2")) { currentSection = el.textContent.trim(); }
+      if (el.matches("h3")) { currentSection = el.textContent.trim(); }
+      if (el.matches("strong")) {
+        var title = el.textContent.trim();
+        var cmdEl = el.closest("p") && el.closest("p").nextElementSibling;
+        var cmd = cmdEl && cmdEl.querySelector("code") ? cmdEl.querySelector("code").innerText.split("\n")[0] : "";
+        var anchor = el.closest("[id]") || el.parentElement.closest("[id]");
+        var id = anchor ? anchor.id : "";
+        // find nearest preceding heading
+        var prev = el.parentElement;
+        while (prev && !prev.id) prev = prev.previousElementSibling || prev.parentElement;
+        index.push({ title: title, section: currentSection, cmd: cmd, id: prev && prev.id ? prev.id : "" });
+      }
+    });
+
+    // ── Search UI ─────────────────────────────────────────────
+    var overlay = document.getElementById("search-overlay");
+    var input   = document.getElementById("search-input");
+    var results = document.getElementById("search-results");
+    var selected = -1;
+
+    function openSearch() {
+      overlay.classList.add("open");
+      input.value = "";
+      selected = -1;
+      renderResults("");
+      setTimeout(function() { input.focus(); }, 50);
+    }
+
+    function closeSearch() {
+      overlay.classList.remove("open");
+    }
+
+    function renderResults(q) {
+      var filtered = q
+        ? index.filter(function(item) {
+            return (item.title + " " + item.cmd + " " + item.section).toLowerCase().includes(q.toLowerCase());
+          })
+        : index;
+
+      if (!filtered.length) {
+        results.innerHTML = '<div class="search-empty">No results for "' + q + '"</div>';
+        return;
+      }
+
+      results.innerHTML = filtered.slice(0, 20).map(function(item, i) {
+        var title = q ? item.title.replace(new RegExp("(" + q + ")", "gi"), '<span class="highlight">$1</span>') : item.title;
+        var cmd   = q ? item.cmd.replace(new RegExp("(" + q + ")", "gi"),   '<span class="highlight">$1</span>') : item.cmd;
+        return '<div class="search-item" data-id="' + item.id + '" data-index="' + i + '">'
+          + '<span class="item-title">' + title + '</span>'
+          + (item.section ? '<span class="item-section">' + item.section + '</span>' : '')
+          + (item.cmd ? '<span class="item-cmd">' + cmd + '</span>' : '')
+          + '</div>';
+      }).join("");
+
+      results.querySelectorAll(".search-item").forEach(function(el) {
+        el.addEventListener("click", function() { navigate(el.dataset.id); });
+        el.addEventListener("mouseenter", function() {
+          selected = parseInt(el.dataset.index);
+          updateSelected();
+        });
+      });
+    }
+
+    function navigate(id) {
+      closeSearch();
+      if (!id) return;
+      var target = document.getElementById(id);
+      if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function updateSelected() {
+      results.querySelectorAll(".search-item").forEach(function(el, i) {
+        el.classList.toggle("selected", i === selected);
+      });
+      var sel = results.querySelector(".search-item.selected");
+      if (sel) sel.scrollIntoView({ block: "nearest" });
+    }
+
+    input.addEventListener("input", function() {
+      selected = -1;
+      renderResults(input.value.trim());
+    });
+
+    input.addEventListener("keydown", function(e) {
+      var items = results.querySelectorAll(".search-item");
+      if (e.key === "ArrowDown") { e.preventDefault(); selected = Math.min(selected + 1, items.length - 1); updateSelected(); }
+      if (e.key === "ArrowUp")   { e.preventDefault(); selected = Math.max(selected - 1, 0); updateSelected(); }
+      if (e.key === "Enter") {
+        var sel = results.querySelector(".search-item.selected");
+        if (sel) navigate(sel.dataset.id);
+      }
+      if (e.key === "Escape") closeSearch();
+    });
+
+    overlay.addEventListener("click", function(e) { if (e.target === overlay) closeSearch(); });
+    document.getElementById("open-search").addEventListener("click", openSearch);
+
+    document.addEventListener("keydown", function(e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") { e.preventDefault(); openSearch(); }
+      if (e.key === "Escape") closeSearch();
+    });
+  });
+</script>
 </body>
 </html>
