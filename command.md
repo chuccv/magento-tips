@@ -2,20 +2,24 @@
 
 ## MySQL Import / Export
 
+**Import with optimization flags**
 ```bash
-# Import with optimization flags
 (echo "SET SESSION unique_checks=0; SET SESSION foreign_key_checks=0; SET SESSION autocommit=0;"; gunzip -c back_up/gsp.010626.sql.gz; echo "COMMIT;") | mysql -hdb -u root -p magento
+```
 
-# Import with pv (progress bar)
+**Import with pv (progress bar)**
+```bash
 pv back_up/gsp.010626.sql.gz | gunzip | mysql -hdb -u root -p magento
+```
 
-# Export database
+**Export database**
+```bash
 mysqldump -h 127.0.0.1 -u root dashboard > dashboard.sql
-# mysqldump -h host_name -u username database_name tableName > tableName.sql
+```
 
-# Import database
+**Import database**
+```bash
 mysql -u root -p database_name < dbname.sql
-# mysql -p -u username database_name < file.sql
 ```
 
 ---
@@ -24,8 +28,8 @@ mysql -u root -p database_name < dbname.sql
 
 ### Setup & Install
 
+**Install Magento**
 ```bash
-# Install Magento
 sudo php bin/magento setup:install \
   --base-url=http://ce247.com/ \
   --db-host=127.0.0.1 \
@@ -44,67 +48,116 @@ sudo php bin/magento setup:install \
   --backend-frontname="admin" \
   --search-engine=elasticsearch7 \
   --cleanup-database
+```
 
-# Create admin user
+**Create admin user**
+```bash
 php bin/magento admin:user:create \
   --admin-user=admin1 \
   --admin-password=admin123 \
   --admin-email=hi1@mageplaza.com \
   --admin-firstname=Mageplaza \
   --admin-lastname=Family
+```
 
-# Composer create project
+**Install CE**
+```bash
 composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition=2.4.7-p3 ce247p3
+```
+
+**Install EE**
+```bash
 composer create-project --repository-url=https://repo.magento.com/ magento/project-enterprise-edition=2.4.7 ee247
 ```
 
+---
+
 ### Module Management
 
+**Disable 2FA modules**
 ```bash
-# Disable 2FA modules
 sudo php bin/magento module:disable Magento_AdminAdobeImsTwoFactorAuth Magento_TwoFactorAuth
+```
 
-# DI compile
+**DI compile**
+```bash
 php -d memory_limit=5G bin/magento setup:di:compile
+```
 
-# Set developer mode
+**Set developer mode**
+```bash
 php bin/magento deploy:mode:set developer
+```
 
-# Generate fixtures (performance toolkit)
+**Generate fixtures (performance toolkit)**
+```bash
 php bin/magento setup:perf:generate-fixtures setup/performance-toolkit/profiles/ce/small.xml
 ```
 
+---
+
 ### Config Settings
 
+**Disable admin captcha**
 ```bash
-# Disable captcha
 sudo php bin/magento config:set admin/captcha/enable 0
+```
+
+**Disable customer captcha**
+```bash
 sudo php bin/magento config:set customer/captcha/enable 0
+```
 
-# Disable form key (dev only)
+**Disable form key (dev only)**
+```bash
 sudo php bin/magento config:set admin/security/use_form_key 0
+```
 
-# Disable password lifetime
+**Disable password lifetime**
+```bash
 php bin/magento config:set admin/security/password_lifetime 00
+```
 
-# Template hints
+**Enable template hints**
+```bash
 sudo php bin/magento dev:template-hints:enable
+```
 
-# JS/CSS optimization
+**Disable JS merge**
+```bash
 php -d memory_limit=-1 bin/magento config:set dev/js/merge_files 0
+```
+
+**Disable JS bundling**
+```bash
 php -d memory_limit=-1 bin/magento config:set dev/js/enable_js_bundling 0
+```
+
+**Enable CSS merge**
+```bash
 php bin/magento config:set dev/css/merge_css_files 1
+```
+
+**Disable CSS minify**
+```bash
 php bin/magento config:set dev/css/minify_files 0
+```
 
-# Elasticsearch index prefix
+**Set Elasticsearch index prefix**
+```bash
 php bin/magento config:set catalog/search/elasticsearch7_index_prefix ce247p3_chuccv
+```
 
-# Base URL (ngrok)
+**Set base URL (ngrok)**
+```bash
 sudo bin/magento config:set web/unsecure/base_url https://open-moderately-mudfish.ngrok-free.app/DashBroard/pub/
 ```
 
+---
+
 ### File Permissions
 
+**Fix permissions**
 ```bash
 sudo chown -R www-data:www-data generated/ var/ pub/
 ```
@@ -113,14 +166,16 @@ sudo chown -R www-data:www-data generated/ var/ pub/
 
 ## PHP Version Management
 
+**Switch PHP version (Apache)**
 ```bash
-# Switch PHP version (Apache)
 sudo a2dismod php7.1
 sudo a2enmod php8.1
 sudo service apache2 restart
 sudo update-alternatives --set php /usr/bin/php8.1
+```
 
-# Install PHP 8.2 with Magento modules
+**Install PHP 8.2 with Magento modules**
+```bash
 sudo apt install php8.2 libapache2-mod-php8.2 php8.2-common php8.2-gmp php8.2-curl \
   php8.2-soap php8.2-bcmath php8.2-intl php8.2-mbstring php8.2-xmlrpc php8.2-mysql \
   php8.2-gd php8.2-xml php8.2-cli php8.2-zip
@@ -130,14 +185,16 @@ sudo apt install php8.2 libapache2-mod-php8.2 php8.2-common php8.2-gmp php8.2-cu
 
 ## Services Management
 
+**Stop all services**
 ```bash
-# Stop all services
 sudo systemctl stop apache2
 sudo systemctl stop mysql
 sudo systemctl stop elasticsearch
 sudo systemctl stop varnish
+```
 
-# Start all services
+**Start all services**
+```bash
 sudo systemctl start apache2
 sudo systemctl start mysql
 sudo systemctl start elasticsearch
@@ -148,13 +205,12 @@ sudo service varnish restart
 
 ## Elasticsearch
 
+**Heap size config**
 ```bash
-# Heap size config
 sudo nano /etc/elasticsearch/jvm.options
 ```
 
-### Sample ES Query
-
+**Sample ES Query**
 ```json
 {
   "from": 0,
@@ -177,23 +233,26 @@ sudo nano /etc/elasticsearch/jvm.options
 
 ## Code Quality
 
+**PHPCS check**
 ```bash
-# PHPCS check
 vendor/bin/phpcs app/code/Mageplaza/Osc/ --standard=Magento2 --severity=10 --extensions=php,phtml
+```
 
-# Generate whitelist
+**Generate whitelist**
+```bash
 sudo php bin/magento setup:db-declaration:generate-whitelist --module-name=Mageplaza_Osc
-
-# Coding standard reference
-# https://github.com/magento/magento-coding-standard
 ```
 
 ---
 
 ## Composer
 
+**Require module**
 ```bash
 composer require mageplaza/module-social-login:dev-2.4-develop
+```
+
+```bash
 composer require mageplaza/module-core
 ```
 
@@ -201,6 +260,7 @@ composer require mageplaza/module-core
 
 ## Xdebug
 
+**Start with Xdebug**
 ```bash
 XDEBUG_SESSION_START="PHPSTORM" php bin/magento se:up
 ```
@@ -209,28 +269,31 @@ XDEBUG_SESSION_START="PHPSTORM" php bin/magento se:up
 
 ## SSH & ngrok
 
+**Generate SSH key**
 ```bash
-# Generate SSH key
 ssh-keygen -t rsa -b 4096 -C "chuccv@mageplaza.com"
+```
 
-# ngrok tunnel
+**ngrok tunnel**
+```bash
 ngrok http --domain=open-moderately-mudfish.ngrok-free.app 80
 ```
 
 ---
 
-## Useful Debug Snippets
+## Debug Snippets
 
+**Tail MySQL log**
 ```bash
-# Tail MySQL log
 sudo tail -f /var/log/mysql/mysql.log
-
-# Grep in codebase
-grep -rnw "getStoreId" app/
-grep "getHtmlSlider"
 ```
 
+**Grep in codebase**
+```bash
+grep -rnw "getStoreId" app/
+```
+
+**PHP debug output**
 ```php
 echo '<pre>'; var_dump($variable); echo '</pre>';
 ```
-
