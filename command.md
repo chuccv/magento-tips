@@ -1,4 +1,4 @@
-# MySQL & Magento Commands Reference
+# MySQL and Magento Commands Reference
 
 ## MySQL Import / Export
 
